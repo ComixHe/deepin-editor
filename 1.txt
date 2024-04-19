@@ -1,0 +1,1 @@
+libpolkit-qt5-1-dev, libkf5syntaxhighlighting-dev, libkf5codecs-dev, libdframeworkdbus-dev, libgtest-dev, libgmock-dev, libchardet-dev, libuchardet-dev (>= 0.0.6), libicu-dev

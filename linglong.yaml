@@ -1,46 +1,39 @@
+version: "1"
+
 package:
   id: org.deepin.editor
   name: "deepin-editor"
-  version: 5.10.13
+  version: 6.0.17.3
   kind: app
   description: |
     editor for deepin os.
 
-runtime:
-  id: org.deepin.Runtime
-  version: 23.0.0
+base: org.deepin.foundation/20.0.0
 
-depends:
-  - id: "dde-qt-dbus-factory"
-    version: 5.5.12
-    type: runtime
-  - id: libchardet
-    version: 1.0.4
-    type: runtime
-  - id: kcodecs
-    version: 5.54.0
-    type: runtime
-  - id: "ksyntax-highlighting"
-    version: 5.54.0
-    type: runtime
-  - id: googletest 
-    version: 1.8.1 
-  - id: xcb-util
-    type: runtime
+runtime: org.deepin.Runtime/20.0.0
+
+command:
+  - "/opt/apps/org.deepin.editor/files/bin/deepin-editor"
+
 variables:
   extra_args: |
     -DVERSION=${VERSION}
 source:
-  kind: local
+  - kind: local
+    name: deepin-editor
 
+build: |
+      SYSTEM_PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/lib/${TRIPLET}/pkgconfig:/usr/share/pkgconfig
+      RUNTIME_PKG_CONFIG_PATH=/runtime/lib/pkgconfig:/runtime/lib/${TRIPLET}/pkgconfig:/runtime/share/pkgconfig
+      APP_PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig:$PREFIX/lib/${TRIPLET}/pkgconfig:$PREFIX/share/pkgconfig
+      export PKG_CONFIG_PATH=$SYSTEM_PKG_CONFIG_PATH:$RUNTIME_PKG_CONFIG_PATH:$APP_PKG_CONFIG_PATH
 
-build:
-  kind: manual
-  manual:
-    configure: |
+      ./tools/deb-source.bash linglong/pool ${PREFIX}
+      sed -i "s|\/usr|$PREFIX|g" ${PREFIX}/lib/${TRIPLET}/cmake/DFrameworkdbus/DFrameworkdbusConfig.cmake
+
       mkdir build
       cd build
-      cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} ${extra_args} ..
+      cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} -DVERSION=6.0.17.3 ..
       make -j6
       #make test -j6
       #test 用例包含从/usr/share读取内容，会导致失败
